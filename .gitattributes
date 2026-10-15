@@ -1,3 +1,6 @@
 # Fixed-width fixtures are ISO-8859-1 with exact byte columns and deliberate CRLF/LF
 # line endings: git must never convert line endings or re-encode them.
 fixtures/fixed-width/** -text
+
+# The Latin-1 XML fixture must keep its exact bytes as well.
+fixtures/xml/*latin1* -text

@@ -13,6 +13,7 @@ import {
   type RecordSpec,
   type RecordType,
 } from './fixed-width.layout';
+import { REPLACEMENT_CHAR } from './text';
 
 type Fields = Record<string, string>;
 
@@ -143,7 +144,7 @@ function looksUtf8(line: Buffer): boolean {
   const asUtf8 = line.toString('utf8');
   return (
     /[\u0080-\uffff]/.test(asUtf8) &&
-    !asUtf8.includes('\uFFFD') &&
+    !asUtf8.includes(REPLACEMENT_CHAR) &&
     asUtf8.trimEnd().length <= RECORD_LENGTH
   );
 }

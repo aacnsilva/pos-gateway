@@ -14,3 +14,6 @@ charset = latin1
 trim_trailing_whitespace = false
 insert_final_newline = false
 end_of_line = unset
+
+[fixtures/xml/*latin1*]
+charset = latin1

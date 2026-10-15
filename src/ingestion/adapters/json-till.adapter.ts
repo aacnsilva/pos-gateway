@@ -1,12 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { fail, toFieldErrors, validateNewSale, type NewSale, type Result } from '../../canonical';
 import type { PosFormatAdapter } from '../pos-format-adapter';
+import { stripBom } from './text';
 import { jsonSaleV1, SUPPORTED_JSON_SCHEMA_VERSIONS, type JsonSaleV1 } from './json-till.schema';
-
-/** Built from its code point so formatters can't turn it into an invisible literal. */
-const UTF8_BOM = String.fromCharCode(0xfeff);
-
-const stripBom = (text: string) => (text.startsWith(UTF8_BOM) ? text.slice(1) : text);
 
 /** Modern JSON till payload (docs/formats/json.md). */
 @Injectable()

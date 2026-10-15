@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Same sale as fixtures/json/ev-charging.json, sent by a till that reports local time with an offset. -->
+<Sale schemaVersion="1">
+  <Merchant>MERCH01</Merchant>
+  <Site>SITE042</Site>
+  <Terminal>TERM0001</Terminal>
+  <Receipt>R000123</Receipt>
+  <OccurredAt>2026-10-15T15:30:00+01:00</OccurredAt>
+  <Currency>EUR</Currency>
+  <Totals>
+    <Total>11.32</Total>
+    <Tax>2.12</Tax>
+  </Totals>
+  <Lines>
+    <Line>
+      <Sku>EV-KWH</Sku>
+      <Description>DC fast charge</Description>
+      <Quantity unit="KWH">18.500</Quantity>
+      <UnitPrice>0.45</UnitPrice>
+      <LineTotal>8.32</LineTotal>
+      <TaxRate>23.00</TaxRate>
+    </Line>
+    <Line>
+      <Sku>PARKING-MIN</Sku>
+      <Description>Parking while charging</Description>
+      <Quantity unit="MINUTE">60</Quantity>
+      <UnitPrice>0.05</UnitPrice>
+      <LineTotal>3.00</LineTotal>
+      <TaxRate>23</TaxRate>
+    </Line>
+  </Lines>
+  <Payment method="CARD">
+    <Token>tok_8f3kD92LmQ</Token>
+    <CardBrand>VISA</CardBrand>
+  </Payment>
+</Sale>
