@@ -53,6 +53,17 @@ export const paymentSchema = z.strictObject({
     .optional(),
 });
 
+/**
+ * Free-form till context (shift id, operator code...). Bounded so it can't become a
+ * dumping ground; values are still subject to the card-number check in ingestion (#11).
+ */
+export const metadataSchema = z
+  .record(
+    z.string().regex(/^[A-Za-z][A-Za-z0-9_.-]{0,39}$/, 'invalid metadata key'),
+    z.string().max(500),
+  )
+  .refine((m) => Object.keys(m).length <= 20, 'at most 20 metadata entries');
+
 export const sourceSchema = z.strictObject({
   /** Adapter slug, e.g. `json`, `fixed-width`, `xml`. Open-ended so new formats don't touch the model. */
   format: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'must be a lowercase slug'),
@@ -77,6 +88,7 @@ export const newSaleSchema = z
     taxMinor: minorUnits,
     lines: z.array(transactionLineSchema).min(1).max(500),
     payment: paymentSchema,
+    metadata: metadataSchema.optional(),
     source: sourceSchema,
   })
   .superRefine((sale, ctx) => {

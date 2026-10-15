@@ -108,6 +108,7 @@ interface NewSale {
     paymentToken: string;        // provider token ("tok_..."); never a PAN
     cardBrand?: string;          // e.g. "VISA", for display/reporting only
   };
+  metadata?: Record<string, string>; // free-form till context, bounded (20 keys)
   source: { format: string; schemaVersion: string }; // adapter slug: 'json' | 'fixed-width' | 'xml' | ...
 }
 

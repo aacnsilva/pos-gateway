@@ -144,9 +144,10 @@ describe('validateNewSale', () => {
     it('rejects an extra pan field', () => {
       const sale = evSale();
       const payment = { ...sale.payment, pan: '4111111111111111' };
-      expect(errorsFor({ ...sale, payment })).toContainEqual(
-        expect.objectContaining({ path: 'payment', message: expect.stringContaining('pan') }),
-      );
+      expect(errorsFor({ ...sale, payment })).toContainEqual({
+        path: 'payment.pan',
+        message: 'unknown field',
+      });
     });
 
     it('rejects a card number passed as the token', () => {
@@ -166,9 +167,10 @@ describe('validateNewSale', () => {
     });
 
     it('rejects gateway-owned fields coming from a till', () => {
-      expect(errorsFor({ ...evSale(), id: 'x', status: 'CAPTURED' })).toContainEqual(
-        expect.objectContaining({ path: '(root)', message: expect.stringContaining('status') }),
-      );
+      expect(errorsFor({ ...evSale(), id: 'x', status: 'CAPTURED' })).toEqual([
+        { path: 'id', message: 'unknown field' },
+        { path: 'status', message: 'unknown field' },
+      ]);
     });
 
     it('reports every missing field, not just the first', () => {

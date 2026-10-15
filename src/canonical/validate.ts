@@ -8,8 +8,16 @@ export function validateNewSale(input: unknown): Result<NewSale> {
   return parsed.success ? ok(parsed.data) : fail(toFieldErrors(parsed.error));
 }
 
+/** One error per offending field; unknown keys are reported at their own path. */
 export function toFieldErrors(error: z.ZodError): FieldError[] {
-  return error.issues.map((issue) => ({ path: formatPath(issue.path), message: issue.message }));
+  return error.issues.flatMap((issue) =>
+    issue.code === 'unrecognized_keys'
+      ? issue.keys.map((key) => ({
+          path: formatPath([...issue.path, key]),
+          message: 'unknown field',
+        }))
+      : [{ path: formatPath(issue.path), message: issue.message }],
+  );
 }
 
 /** `['lines', 2, 'quantity']` → `lines[2].quantity` */

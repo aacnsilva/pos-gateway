@@ -17,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "docs:schemas": "UPDATE_SCHEMAS=1 jest test/json-schema.spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1",
+  "merchantId": "MERCH01",
+  "siteId": "SITE007",
+  "terminalId": "PAYSTATION03",
+  "externalRef": "P-2026-104455",
+  "occurredAt": "2026-10-15T08:12:45Z",
+  "currency": "EUR",
+  "totalMinor": 380,
+  "taxMinor": 71,
+  "lines": [
+    {
+      "sku": "PARKING-MIN",
+      "description": "Short stay parking",
+      "quantity": 95,
+      "unit": "MINUTE",
+      "unitPriceMinor": 4,
+      "lineTotalMinor": 380,
+      "taxRateBps": 2300
+    }
+  ],
+  "payment": { "method": "WALLET", "paymentToken": "tok_Wq81mZpA0c" }
+}
