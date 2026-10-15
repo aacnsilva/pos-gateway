@@ -6,7 +6,7 @@ A TypeScript backend that sits between point-of-sale (POS) tills and a payments 
 
 The domain is modelled on **mobility and EV-charging style payments**: unattended or attended tills at parking sites, fuel/charging stations and shops, where networks are flaky, clients retry aggressively, and every charge must happen **exactly once from the customer's point of view**.
 
-It's a personal engineering showcase focused on the unglamorous parts that make payment systems trustworthy: idempotency, the transactional outbox, at-least-once delivery, idempotent consumers and dead-letter handling.
+It's a personal learning and showcase project: not used in production, with no real merchants, users or card data. It focuses on the unglamorous parts that make payment systems trustworthy: idempotency, the transactional outbox, at-least-once delivery, idempotent consumers and dead-letter handling.
 
 ## Contents
 
@@ -25,9 +25,10 @@ It's a personal engineering showcase focused on the unglamorous parts that make 
 - **Safe payments API** – a NestJS API backed by PostgreSQL where every mutating request carries an `Idempotency-Key`; retries never double-charge.
 - **Reliable events** – `transaction.authorized`, `transaction.captured` and `transaction.failed` events published to Kafka (Redpanda locally) through a **transactional outbox**.
 - **Resilient consumption** – a consumer with bounded retries, exponential backoff, a dead-letter topic and de-duplication on consume.
+- **Extensible** – each till format is a self-contained adapter module; adding a new POS format shouldn't touch the payments core.
 - **Operable** – Docker Compose, liveness/readiness probes, integration tests with Testcontainers and simple Kubernetes manifests.
 
-Non-goals: a frontend, a real card network/acquirer integration, PCI-scope card data handling (the payment provider is simulated).
+Non-goals: a frontend, a real card network/acquirer integration, handling raw card data (the payment provider is simulated and only returns tokens).
 
 ## Architecture
 
@@ -104,7 +105,8 @@ interface Transaction {
   lines: TransactionLine[];
   payment: {
     method: 'CARD' | 'WALLET' | 'FLEET_CARD';
-    maskedPan?: string;          // never full card numbers
+    paymentToken: string;        // tokenised reference from the provider; never a PAN
+    cardBrand?: string;          // e.g. "VISA", for display/reporting only
   };
   status: TransactionStatus;
   source: { format: 'json' | 'fixed-width' | 'xml'; schemaVersion: string };
@@ -128,6 +130,20 @@ L|EV-KWH      |000018.500|000000045|2300
 ```
 
 The real fixed-width format is column-positioned rather than pipe-delimited; the pipes above are only for readability.
+
+### Adding a POS format
+
+Parsers implement one small interface and register themselves with the ingestion module, so a new till format is one module plus fixtures:
+
+```ts
+interface PosFormatAdapter {
+  readonly format: string;                          // e.g. "xml"
+  canHandle(contentType: string, raw: Buffer): boolean;
+  parse(raw: Buffer): ParseResult<Transaction>;     // typed errors, no throwing on bad input
+}
+```
+
+A step-by-step guide (`docs/adding-a-pos-format.md`) is planned as part of M1.
 
 ## API sketch
 
@@ -208,11 +224,19 @@ Together, the outbox and idempotent consumers give **effectively-once processing
 
 Event types: `transaction.authorized`, `transaction.captured`, `transaction.failed`.
 
+### PCI-aware design notes
+
+These are design notes for a learning project. The aim is to keep the gateway out of card-data scope by design:
+
+- The gateway **never receives or stores a PAN**, CVV or track data. Tills (and the simulated provider) hand over a **tokenised payment reference**, and that token is the only payment credential persisted.
+- Ingestion rejects payloads that look like they contain a full card number (Luhn-valid 13–19 digit sequences) instead of storing them.
+- Structured logs go through a **redaction** step: tokens are truncated, and fields such as `pan`, `cvv` and `track` are dropped. Request bodies are never logged verbatim.
+
 ## Tech stack
 
 - **Language/runtime:** TypeScript, Node.js LTS
 - **Framework:** NestJS
-- **Database:** PostgreSQL (migrations versioned in the repo)
+- **Database:** PostgreSQL (migrations versioned in the repo; indexes on idempotency-key and transaction lookups, plus an optional read-through cache for `GET /v1/transactions/{id}`)
 - **Messaging:** Kafka protocol, using Redpanda locally
 - **Testing:** Jest, Testcontainers (PostgreSQL + Redpanda)
 - **Ops:** Docker, Docker Compose, Kubernetes manifests
@@ -220,7 +244,7 @@ Event types: `transaction.authorized`, `transaction.captured`, `transaction.fail
 
 ## Running locally (planned)
 
-> Not runnable yet. This section describes the target developer experience delivered in M5.
+> Not runnable yet. This section describes the target developer experience once Docker Compose lands (M5).
 
 ```bash
 # start PostgreSQL + Redpanda + the gateway
@@ -244,14 +268,18 @@ npm run test:integration
 
 Work is tracked as [issues](https://github.com/aacnsilva/pos-gateway/issues) grouped into [milestones](https://github.com/aacnsilva/pos-gateway/milestones):
 
-| Milestone | Scope | Target |
+| Milestone | Scope | Priority |
 | --- | --- | --- |
-| [M1 – Parsing & canonical model](https://github.com/aacnsilva/pos-gateway/milestone/1) | Canonical model, JSON / fixed-width / XML parsers, fixtures | 18 Oct 2026 |
-| [M2 – Payments API & idempotency](https://github.com/aacnsilva/pos-gateway/milestone/2) | NestJS API, PostgreSQL schema, Idempotency-Key | 21 Oct 2026 |
-| [M3 – Events & transactional outbox](https://github.com/aacnsilva/pos-gateway/milestone/3) | Outbox table, relay, event contract | 23 Oct 2026 |
-| [M4 – Consumer: retries, backoff & DLQ](https://github.com/aacnsilva/pos-gateway/milestone/4) | Idempotent consumer, backoff, dead-letter topic | 25 Oct 2026 |
-| [M5 – Ops: Compose, health, Kubernetes](https://github.com/aacnsilva/pos-gateway/milestone/5) | Docker Compose, probes, k8s manifests | 26 Oct 2026 |
-| [M6 – Tests & docs](https://github.com/aacnsilva/pos-gateway/milestone/6) | Testcontainers integration suite, CI, final docs | 26 Oct 2026 |
+| [M1 – Parsing & canonical model](https://github.com/aacnsilva/pos-gateway/milestone/1) | Canonical model, adapter interface, JSON / fixed-width / XML parsers, fixtures | core |
+| [M2 – Payments API & idempotency](https://github.com/aacnsilva/pos-gateway/milestone/2) | NestJS API, PostgreSQL schema and indexes, Idempotency-Key | core |
+| [M3 – Events & transactional outbox](https://github.com/aacnsilva/pos-gateway/milestone/3) | Outbox table, relay, event contract | core |
+| [M6 – Tests & docs](https://github.com/aacnsilva/pos-gateway/milestone/6) | Testcontainers integration tests for M1–M3, CI, design decisions | core (tests), next (rest) |
+| [M4 – Consumer: retries, backoff & DLQ](https://github.com/aacnsilva/pos-gateway/milestone/4) | Idempotent consumer, backoff, dead-letter topic | next |
+| [M5 – Ops: Compose, health, Kubernetes](https://github.com/aacnsilva/pos-gateway/milestone/5) | Docker Compose and probes (next); Kubernetes manifests, GCP deploy note (stretch, after M4) | next / stretch |
+
+Labels: `core` is the essential path (M1–M3 and their tests), `next` comes right after, and `stretch` is optional (Kubernetes manifests, a read cache, a short GCP deploy note for Cloud Run or GKE with Cloud SQL).
+
+The reasoning behind the main trade-offs is recorded in [DECISIONS.md](DECISIONS.md).
 
 ## License
 
