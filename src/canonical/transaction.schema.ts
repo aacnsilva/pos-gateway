@@ -54,7 +54,8 @@ export const paymentSchema = z.strictObject({
 });
 
 export const sourceSchema = z.strictObject({
-  format: z.enum(['json', 'fixed-width', 'xml']),
+  /** Adapter slug, e.g. `json`, `fixed-width`, `xml`. Open-ended so new formats don't touch the model. */
+  format: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'must be a lowercase slug'),
   schemaVersion: nonBlank(20),
 });
 

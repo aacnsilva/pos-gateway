@@ -108,7 +108,7 @@ interface NewSale {
     paymentToken: string;        // provider token ("tok_..."); never a PAN
     cardBrand?: string;          // e.g. "VISA", for display/reporting only
   };
-  source: { format: 'json' | 'fixed-width' | 'xml'; schemaVersion: string };
+  source: { format: string; schemaVersion: string }; // adapter slug: 'json' | 'fixed-width' | 'xml' | ...
 }
 
 interface Transaction extends NewSale {
@@ -140,17 +140,18 @@ The real fixed-width format is column-positioned rather than pipe-delimited; the
 
 ### Adding a POS format
 
-Parsers implement one small interface and register themselves with the ingestion module, so a new till format is one module plus fixtures:
+Parsers implement one small interface and are registered with the ingestion module, so a new till format is one module plus fixtures:
 
 ```ts
 interface PosFormatAdapter {
-  readonly format: string;                          // e.g. "xml"
-  canHandle(contentType: string, raw: Buffer): boolean;
-  parse(raw: Buffer): ParseResult<Transaction>;     // typed errors, no throwing on bad input
+  readonly format: string;                          // slug stored as source.format, e.g. "xml"
+  readonly mediaTypes: readonly string[];           // e.g. ["application/xml", "text/xml"]
+  looksLike(raw: Buffer): boolean;                  // cheap sniff, used only without a specific Content-Type
+  parse(raw: Buffer): Result<NewSale>;              // typed errors, no throwing on bad input
 }
 ```
 
-A step-by-step guide (`docs/adding-a-pos-format.md`) is planned as part of M1.
+The `Content-Type` header decides the adapter. The body is sniffed only when the header is missing or `application/octet-stream`, and an ambiguous match is rejected rather than guessed. Unknown media types get `415`. See [docs/adding-a-pos-format.md](docs/adding-a-pos-format.md).
 
 ## API sketch
 
@@ -178,6 +179,7 @@ Responses:
 - `409 Conflict` – the same key is currently being processed by another request.
 - `422 Unprocessable Entity` – the same key was reused with a **different** payload.
 - `400 Bad Request` – the payload fails parsing or validation (errors point at the offending field/column).
+- `415 Unsupported Media Type` – the `Content-Type` isn't a registered till format.
 
 ## Idempotency and delivery guarantees
 
