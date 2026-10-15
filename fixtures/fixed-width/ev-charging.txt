@@ -1,0 +1,5 @@
+H01MERCH01     SITE042     TERM0001    20261015T143000ZEURR000123               
+LEV-KWH      DC fast charge                0000018500K00000004500000083202300   
+LPARKING-MIN Parking while charging        0000060000M00000000500000030002300   
+PCtok_8f3kD92LmQ                                                      VISA      
+T00020000000113200000000212                                                     

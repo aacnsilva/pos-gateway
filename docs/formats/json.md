@@ -5,7 +5,7 @@
 | Media type | `application/json` |
 | Encoding | UTF-8 (a leading BOM is tolerated) |
 | Adapter | `src/ingestion/adapters/json-till.adapter.ts` (`source.format = "json"`) |
-| Machine-readable schema | [`json-sale-v1.schema.json`](json-sale-v1.schema.json) (JSON Schema 2020-12, generated from the zod schema; `npm run docs:schemas`) |
+| Machine-readable schema | [`json-sale-v1.schema.json`](json-sale-v1.schema.json) (JSON Schema 2020-12, generated from the zod schema; `npm run docs:sync`) |
 | Fixtures | `fixtures/json/` (EV charging, parking, shop with fuel) |
 
 ## Rules

@@ -7,3 +7,10 @@ indent_style = space
 indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+# Byte-exact legacy fixtures: trailing spaces are padding, not noise.
+[fixtures/fixed-width/**]
+charset = latin1
+trim_trailing_whitespace = false
+insert_final_newline = false
+end_of_line = unset

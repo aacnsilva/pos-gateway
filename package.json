@@ -18,7 +18,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "docs:schemas": "UPDATE_SCHEMAS=1 jest test/json-schema.spec.ts"
+    "docs:sync": "UPDATE_DOCS=1 jest test/docs-sync.spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

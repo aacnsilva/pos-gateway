@@ -4,3 +4,4 @@ node_modules/
 package-lock.json
 *.md
 docs/formats/*.schema.json
+docs/formats/fixed-width.md

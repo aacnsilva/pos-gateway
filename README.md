@@ -130,14 +130,14 @@ interface TransactionLine {
 
 **The till owns the tax and rounding.** The receipt the customer holds is the source of truth, so the gateway charges `totalMinor` exactly as sent and doesn't recompute tax. It only checks consistency: `totalMinor` equals the sum of the line totals, `taxMinor` doesn't exceed `totalMinor`, and each `lineTotalMinor` is within 1 minor unit of `quantity × unitPriceMinor` (so 18.5 kWh × 45c = 832.5c may be printed as 832 or 833). The last check catches parser bugs such as a misplaced implied decimal. Schemas live in `src/canonical/` (zod).
 
-**Legacy fixed-width sketch** (one header record `H`, n line records `L`; positions documented in `docs/formats/` as part of M1):
+**Legacy fixed-width** (ISO-8859-1, 80-byte records with byte column positions: one header `H`, n lines `L`, a payment `P` and a trailer `T` with the line count and totals; full layout in [docs/formats/fixed-width.md](docs/formats/fixed-width.md); trailing spaces trimmed below):
 
 ```
-H|TERM0001|SITE042|20261015T143000Z|EUR|R000123
-L|EV-KWH      |000018.500|000000045|000000832|2300
+H01MERCH01     SITE042     TERM0001    20261015T143000ZEURR000123
+LEV-KWH      DC fast charge                0000018500K00000004500000083202300
+PCtok_8f3kD92LmQ                                                      VISA
+T00010000000083200000000156
 ```
-
-The real fixed-width format is column-positioned rather than pipe-delimited; the pipes above are only for readability.
 
 ### Adding a POS format
 
@@ -267,7 +267,7 @@ curl localhost:3000/health/ready
 curl -X POST localhost:3000/v1/sales \
   -H 'Content-Type: text/plain' \
   -H "Idempotency-Key: $(uuidgen)" \
-  --data-binary @fixtures/fixed-width/sale-ev-charging.txt
+  --data-binary @fixtures/fixed-width/ev-charging.txt
 
 # run unit + integration tests (needs Docker for Testcontainers)
 npm test
