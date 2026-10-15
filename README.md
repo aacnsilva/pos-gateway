@@ -92,41 +92,48 @@ All input formats map into one model. Amounts are integer **minor units** (cents
 ```ts
 type TransactionStatus = 'PENDING' | 'AUTHORIZED' | 'CAPTURED' | 'FAILED';
 
-interface Transaction {
-  id: string;                    // UUID, gateway-generated
+// What an ingestion adapter produces. `id` and `status` are assigned by the gateway, never by a till.
+interface NewSale {
   merchantId: string;
   siteId: string;                // e.g. parking site / charging station
   terminalId: string;            // till id
   externalRef: string;           // till receipt / sale number
-  occurredAt: string;            // ISO 8601, UTC
+  occurredAt: string;            // ISO 8601, UTC only (ends in "Z")
   currency: string;              // ISO 4217, e.g. "EUR"
-  totalMinor: number;            // sum of lines incl. tax, in minor units
-  taxMinor: number;
+  totalMinor: number;            // gross amount to charge = sum of lineTotalMinor
+  taxMinor: number;              // tax contained in totalMinor, as computed by the till
   lines: TransactionLine[];
   payment: {
     method: 'CARD' | 'WALLET' | 'FLEET_CARD';
-    paymentToken: string;        // tokenised reference from the provider; never a PAN
+    paymentToken: string;        // provider token ("tok_..."); never a PAN
     cardBrand?: string;          // e.g. "VISA", for display/reporting only
   };
-  status: TransactionStatus;
   source: { format: 'json' | 'fixed-width' | 'xml'; schemaVersion: string };
 }
 
+interface Transaction extends NewSale {
+  id: string;                    // UUID, gateway-generated
+  status: TransactionStatus;
+}
+
 interface TransactionLine {
-  sku: string;                   // e.g. "EV-KWH", "PARKING-HOUR"
+  sku: string;                   // e.g. "EV-KWH", "PARKING-MIN"
   description: string;
-  quantity: number;              // decimal allowed, e.g. kWh
+  quantity: number;              // up to 3 decimals, e.g. 18.5 kWh
   unit: 'ITEM' | 'KWH' | 'MINUTE' | 'LITRE';
-  unitPriceMinor: number;
+  unitPriceMinor: number;        // gross (tax-inclusive) unit price
+  lineTotalMinor: number;        // gross line amount as printed on the receipt
   taxRateBps: number;            // basis points, 2300 = 23%
 }
 ```
+
+**The till owns the tax and rounding.** The receipt the customer holds is the source of truth, so the gateway charges `totalMinor` exactly as sent and doesn't recompute tax. It only checks consistency: `totalMinor` equals the sum of the line totals, `taxMinor` doesn't exceed `totalMinor`, and each `lineTotalMinor` is within 1 minor unit of `quantity × unitPriceMinor` (so 18.5 kWh × 45c = 832.5c may be printed as 832 or 833). The last check catches parser bugs such as a misplaced implied decimal. Schemas live in `src/canonical/` (zod).
 
 **Legacy fixed-width sketch** (one header record `H`, n line records `L`; positions documented in `docs/formats/` as part of M1):
 
 ```
 H|TERM0001|SITE042|20261015T143000Z|EUR|R000123
-L|EV-KWH      |000018.500|000000045|2300
+L|EV-KWH      |000018.500|000000045|000000832|2300
 ```
 
 The real fixed-width format is column-positioned rather than pipe-delimited; the pipes above are only for readability.

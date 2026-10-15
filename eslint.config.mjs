@@ -20,8 +20,11 @@ export default tseslint.config(
     },
   },
   {
-    // supertest and Nest testing helpers return loosely typed values
+    // supertest, Nest testing helpers and Jest asymmetric matchers are typed as `any`
     files: ['**/*.spec.ts'],
-    rules: { '@typescript-eslint/no-unsafe-argument': 'off' },
+    rules: {
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+    },
   },
 );
