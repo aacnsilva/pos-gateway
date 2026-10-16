@@ -2,8 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
+    "noEmitOnError": true,
     "types": ["node"]
   },
   "include": ["src"],
-  "exclude": ["**/*.spec.ts"]
+  "exclude": ["**/*.spec.ts", "**/*.db-spec.ts"]
 }

@@ -246,7 +246,7 @@ These are design notes for a learning project. The aim is to keep the gateway ou
 
 - **Language/runtime:** TypeScript, Node.js LTS
 - **Framework:** NestJS
-- **Database:** PostgreSQL (migrations versioned in the repo; indexes on idempotency-key and transaction lookups, plus an optional read-through cache for `GET /v1/transactions/{id}`)
+- **Database:** PostgreSQL with Knex and plain-SQL migrations; UUIDv7 keys; invariants as constraints; a partial index for the outbox scan. See [docs/database.md](docs/database.md) for the schema, `EXPLAIN` plans and measurements (optional read-through cache for `GET /v1/transactions/{id}` planned as a stretch goal)
 - **Messaging:** Kafka protocol, using Redpanda locally
 - **Testing:** Jest, Testcontainers (PostgreSQL + Redpanda)
 - **Ops:** Docker, Docker Compose, Kubernetes manifests

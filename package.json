@@ -18,13 +18,19 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "docs:sync": "UPDATE_DOCS=1 jest test/docs-sync.spec.ts"
+    "docs:sync": "UPDATE_DOCS=1 jest test/docs-sync.spec.ts",
+    "test:db": "jest -c jest.db.config.js",
+    "db:migrate": "npm run build && node dist/database/migrate.js latest",
+    "db:rollback": "npm run build && node dist/database/migrate.js rollback",
+    "db:status": "npm run build && node dist/database/migrate.js status"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
     "fast-xml-parser": "^5.11.2",
+    "knex": "^3.3.0",
+    "pg": "^8.23.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "zod": "^4.6.7"
@@ -35,6 +41,7 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
     "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
