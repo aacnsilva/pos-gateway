@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1"
+    },
+    "merchantId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "siteId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "terminalId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "externalRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "totalMinor": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "taxMinor": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "lines": {
+      "minItems": 1,
+      "maxItems": 500,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "quantity": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "ITEM",
+              "KWH",
+              "MINUTE",
+              "LITRE"
+            ]
+          },
+          "unitPriceMinor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "lineTotalMinor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "taxRateBps": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          }
+        },
+        "required": [
+          "sku",
+          "description",
+          "quantity",
+          "unit",
+          "unitPriceMinor",
+          "lineTotalMinor",
+          "taxRateBps"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "payment": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "CARD",
+            "WALLET",
+            "FLEET_CARD"
+          ]
+        },
+        "paymentToken": {
+          "type": "string",
+          "pattern": "^tok_[A-Za-z0-9]{8,64}$"
+        },
+        "cardBrand": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "paymentToken"
+      ],
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,39}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 500
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "merchantId",
+    "siteId",
+    "terminalId",
+    "externalRef",
+    "occurredAt",
+    "currency",
+    "totalMinor",
+    "taxMinor",
+    "lines",
+    "payment"
+  ],
+  "additionalProperties": false,
+  "title": "POS sale (JSON till), schema version 1"
+}

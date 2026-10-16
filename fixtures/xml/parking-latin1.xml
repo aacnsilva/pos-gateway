@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Sale schemaVersion="1">
+  <Merchant>MERCH01</Merchant>
+  <Site>SITE007</Site>
+  <Terminal>PAYSTATION03</Terminal>
+  <Receipt>P-2026-104455</Receipt>
+  <OccurredAt>2026-10-15T08:12:45Z</OccurredAt>
+  <Currency>EUR</Currency>
+  <Totals><Total>3.80</Total><Tax>0.71</Tax></Totals>
+  <Lines>
+    <Line>
+      <Sku>PARKING-MIN</Sku>
+      <Description>Estacionamento Saldanha (1.º piso)</Description>
+      <Quantity unit="MINUTE">95</Quantity>
+      <UnitPrice>0.04</UnitPrice>
+      <LineTotal>3.80</LineTotal>
+      <TaxRate>23</TaxRate>
+    </Line>
+  </Lines>
+  <Payment method="WALLET"><Token>tok_Wq81mZpA0c</Token></Payment>
+</Sale>

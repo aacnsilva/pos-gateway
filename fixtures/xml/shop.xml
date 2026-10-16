@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sale schemaVersion="1">
+  <Merchant>MERCH02</Merchant>
+  <Site>SITE101</Site>
+  <Terminal>SHOP01</Terminal>
+  <Receipt>S000981</Receipt>
+  <OccurredAt>2026-10-15T17:05:10.250Z</OccurredAt>
+  <Currency>EUR</Currency>
+  <Totals><Total>83.94</Total><Tax>15.37</Tax></Totals>
+  <Lines>
+    <Line><Sku>FUEL-DIESEL</Sku><Description>Gasóleo</Description><Quantity unit="LITRE">42.37</Quantity><UnitPrice>1.79</UnitPrice><LineTotal>75.84</LineTotal><TaxRate>23</TaxRate></Line>
+    <Line><Sku>COFFEE</Sku><Description>Café &amp; pastel de nata</Description><Quantity unit="ITEM">2</Quantity><UnitPrice>1.80</UnitPrice><LineTotal>3.60</LineTotal><TaxRate>23</TaxRate></Line>
+    <Line><Sku>SANDWICH</Sku><Description>Sandes de presunto</Description><Quantity unit="ITEM">1</Quantity><UnitPrice>4.50</UnitPrice><LineTotal>4.50</LineTotal><TaxRate>13</TaxRate></Line>
+  </Lines>
+  <Payment method="FLEET_CARD"><Token>tok_Fl33tC4rd99</Token><CardBrand>DKV</CardBrand></Payment>
+</Sale>

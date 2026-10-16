@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1",
+  "merchantId": "MERCH02",
+  "siteId": "SITE101",
+  "terminalId": "SHOP01",
+  "externalRef": "S000981",
+  "occurredAt": "2026-10-15T17:05:10.250Z",
+  "currency": "EUR",
+  "totalMinor": 8394,
+  "taxMinor": 1537,
+  "lines": [
+    {
+      "sku": "FUEL-DIESEL",
+      "description": "Diesel",
+      "quantity": 42.37,
+      "unit": "LITRE",
+      "unitPriceMinor": 179,
+      "lineTotalMinor": 7584,
+      "taxRateBps": 2300
+    },
+    {
+      "sku": "COFFEE",
+      "description": "Espresso",
+      "quantity": 2,
+      "unit": "ITEM",
+      "unitPriceMinor": 180,
+      "lineTotalMinor": 360,
+      "taxRateBps": 2300
+    },
+    {
+      "sku": "SANDWICH",
+      "description": "Ham and cheese sandwich",
+      "quantity": 1,
+      "unit": "ITEM",
+      "unitPriceMinor": 450,
+      "lineTotalMinor": 450,
+      "taxRateBps": 1300
+    }
+  ],
+  "payment": { "method": "FLEET_CARD", "paymentToken": "tok_Fl33tC4rd99", "cardBrand": "DKV" }
+}

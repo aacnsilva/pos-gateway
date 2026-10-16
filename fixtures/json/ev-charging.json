@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1",
+  "merchantId": "MERCH01",
+  "siteId": "SITE042",
+  "terminalId": "TERM0001",
+  "externalRef": "R000123",
+  "occurredAt": "2026-10-15T14:30:00Z",
+  "currency": "EUR",
+  "totalMinor": 1132,
+  "taxMinor": 212,
+  "lines": [
+    {
+      "sku": "EV-KWH",
+      "description": "DC fast charge",
+      "quantity": 18.5,
+      "unit": "KWH",
+      "unitPriceMinor": 45,
+      "lineTotalMinor": 832,
+      "taxRateBps": 2300
+    },
+    {
+      "sku": "PARKING-MIN",
+      "description": "Parking while charging",
+      "quantity": 60,
+      "unit": "MINUTE",
+      "unitPriceMinor": 5,
+      "lineTotalMinor": 300,
+      "taxRateBps": 2300
+    }
+  ],
+  "payment": { "method": "CARD", "paymentToken": "tok_8f3kD92LmQ", "cardBrand": "VISA" },
+  "metadata": { "connectorId": "CCS2-2", "sessionId": "chg-77812" }
+}
